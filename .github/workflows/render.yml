@@ -1,0 +1,30 @@
+name: ViceScope Render Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar arquivos
+        uses: actions/checkout@v4
+
+      - name: Instalar dependencias
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install pillow
+
+      - name: Renderizar video
+        run: |
+          cd "vicescópio-renderização"
+          python render.py
+
+      - name: Salvar video
+        uses: actions/upload-artifact@v4
+        with:
+          name: ViceScope-Video
+          path: vicescópio-renderização/output/*.mp4
+          if-no-files-found: error
