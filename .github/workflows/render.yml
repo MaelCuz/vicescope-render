@@ -1,6 +1,12 @@
 name: ViceScope - Gerar vídeo
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "vicescope-render/**"
+      - ".github/workflows/render.yml"
   workflow_dispatch:
     inputs:
       narration:
@@ -87,9 +93,9 @@ jobs:
         working-directory: ${{ steps.localizar.outputs.render_dir }}
         shell: bash
         env:
-          NARRATION_TEXT: ${{ inputs.narration }}
-          KOKORO_VOICE: ${{ inputs.voice }}
-          KOKORO_SPEED: ${{ inputs.speed }}
+          NARRATION_TEXT: ${{ inputs.narration || 'Rockstar Games just revealed another detail that could change GTA Six. Here is what players need to know before the next trailer.' }}
+          KOKORO_VOICE: ${{ inputs.voice || 'am_adam' }}
+          KOKORO_SPEED: ${{ inputs.speed || '1.08' }}
           HF_HUB_DISABLE_TELEMETRY: "1"
         run: |
           set -euo pipefail
@@ -154,6 +160,6 @@ jobs:
         run: |
           echo "## ViceScope" >> "$GITHUB_STEP_SUMMARY"
           echo "Narração Kokoro e vídeo gerados com sucesso." >> "$GITHUB_STEP_SUMMARY"
-          echo "Voz: ${{ inputs.voice }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Velocidade: ${{ inputs.speed }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Voz: ${{ inputs.voice || 'am_adam' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Velocidade: ${{ inputs.speed || '1.08' }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Baixe o vídeo e o áudio na seção Artifacts." >> "$GITHUB_STEP_SUMMARY"
