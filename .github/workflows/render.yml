@@ -16,138 +16,53 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
 
-    defaults:
-      run:
-        shell: bash
-
     steps:
-      # 1. Baixar os arquivos do repositório
       - name: Baixar arquivos do ViceScope
         uses: actions/checkout@v4
 
-      # 2. Configurar Python
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: pip
-          cache-dependency-path: ""
 
-      # 3. Instalar FFmpeg e bibliotecas
-      - name: Instalar dependências
+      - name: Instalar FFmpeg e fontes
         run: |
           set -euo pipefail
-
-          echo "Instalando FFmpeg..."
           sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg
-
-          echo "Instalando bibliotecas Python..."
-          python -m pip install --upgrade pip
-          python -m pip install pillow
-
-          echo "Verificando ferramentas..."
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
           python --version
           ffmpeg -version | head -n 1
 
-      # 4. Localizar o renderizador
-      - name: Localizar arquivos do ViceScope
+      - name: Localizar renderizador
         id: localizar
+        shell: bash
         run: |
           set -euo pipefail
-
-          echo "Procurando render.py..."
-
-          SCRIPT=$(find "$GITHUB_WORKSPACE" \
-            -type f \
-            -name "render.py" \
-            -not -path "*/.git/*" \
-            -print -quit)
-
+          SCRIPT=$(find "$GITHUB_WORKSPACE" -type f -name "render.py" -not -path "*/.git/*" -print -quit)
           if [[ -z "$SCRIPT" ]]; then
             echo "::error::Arquivo render.py não encontrado."
             exit 1
           fi
-
           DIRETORIO=$(dirname "$SCRIPT")
-
-          echo "Renderizador encontrado:"
-          echo "$SCRIPT"
-
-          echo "Diretório:"
-          echo "$DIRETORIO"
-
+          echo "Renderizador: $SCRIPT"
           echo "render_dir=$DIRETORIO" >> "$GITHUB_OUTPUT"
+          test -f "$DIRETORIO/assets/narration.wav" || { echo "::error::Arquivo assets/narration.wav não encontrado."; exit 1; }
 
-          echo "Arquivos disponíveis:"
-          ls -la "$DIRETORIO"
-
-      # 5. Executar renderização
       - name: Renderizar vídeo
-        id: renderizar
         working-directory: ${{ steps.localizar.outputs.render_dir }}
+        shell: bash
         run: |
           set -euo pipefail
-
-          echo "Iniciando renderização ViceScope..."
-
           mkdir -p output
-
           python render.py
-
-          echo "Verificando resultado..."
-
-          if ! find output -maxdepth 1 \
-            -type f \
-            -name "*.mp4" \
-            -size +0c \
-            | grep -q .; then
-
+          VIDEO=$(find output -maxdepth 1 -type f -name "*.mp4" -size +0c -print -quit)
+          if [[ -z "$VIDEO" ]]; then
             echo "::error::Nenhum MP4 válido foi gerado."
             exit 1
           fi
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height -of default=noprint_wrappers=1 "$VIDEO"
+          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 "$VIDEO"
 
-          echo "Renderização concluída!"
-
-          find output -maxdepth 1 \
-            -type f \
-            -name "*.mp4" \
-            -exec ls -lh {} \;
-
-      # 6. Validar o vídeo gerado
-      - name: Validar arquivo MP4
-        working-directory: ${{ steps.localizar.outputs.render_dir }}
-        run: |
-          set -euo pipefail
-
-          echo "Validando arquivos MP4..."
-
-          while IFS= read -r -d '' VIDEO; do
-
-            echo "Verificando: $VIDEO"
-
-            ffprobe \
-              -v error \
-              -select_streams v:0 \
-              -show_entries stream=codec_name,width,height \
-              -of default=noprint_wrappers=1 \
-              "$VIDEO"
-
-            ffprobe \
-              -v error \
-              -show_entries format=duration \
-              -of default=noprint_wrappers=1 \
-              "$VIDEO"
-
-          done < <(
-            find output \
-              -maxdepth 1 \
-              -type f \
-              -name "*.mp4" \
-              -print0
-          )
-
-      # 7. Disponibilizar vídeo para download
       - name: Salvar vídeo gerado
         uses: actions/upload-artifact@v4
         with:
@@ -157,12 +72,9 @@ jobs:
           retention-days: 7
           compression-level: 0
 
-      # 8. Mostrar resultado
       - name: Resumo da renderização
         if: success()
         run: |
           echo "## ViceScope Render" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Renderização concluída com sucesso." >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "O vídeo está disponível em Artifacts." >> "$GITHUB_STEP_SUMMARY"
