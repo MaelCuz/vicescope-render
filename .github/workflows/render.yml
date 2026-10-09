@@ -14,6 +14,16 @@ on:
         required: true
         type: string
         default: "Rockstar Games just revealed another detail that could change GTA Six. Here is what players need to know before the next trailer."
+      title:
+        description: "Título principal do vídeo"
+        required: true
+        type: string
+        default: "GTA VI NEWS"
+      subtitle:
+        description: "Subtítulo do vídeo"
+        required: true
+        type: string
+        default: "THE DETAIL EVERYONE MISSED"
       voice:
         description: "Voz Kokoro"
         required: true
@@ -110,6 +120,10 @@ jobs:
       - name: Renderizar vídeo
         working-directory: ${{ steps.localizar.outputs.render_dir }}
         shell: bash
+        env:
+          NARRATION_TEXT: ${{ inputs.narration || 'Rockstar Games just revealed another detail that could change GTA Six. Here is what players need to know before the next trailer.' }}
+          VIDEO_TITLE: ${{ inputs.title || 'GTA VI NEWS' }}
+          VIDEO_SUBTITLE: ${{ inputs.subtitle || 'THE DETAIL EVERYONE MISSED' }}
         run: |
           set -euo pipefail
           rm -rf output
@@ -162,4 +176,5 @@ jobs:
           echo "Narração Kokoro e vídeo gerados com sucesso." >> "$GITHUB_STEP_SUMMARY"
           echo "Voz: ${{ inputs.voice || 'am_adam' }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Velocidade: ${{ inputs.speed || '1.08' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Título: ${{ inputs.title || 'GTA VI NEWS' }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Baixe o vídeo e o áudio na seção Artifacts." >> "$GITHUB_STEP_SUMMARY"
