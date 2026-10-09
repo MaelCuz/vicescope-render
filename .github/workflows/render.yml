@@ -1,7 +1,33 @@
-name: Teste de Renderização ViceScope
+name: ViceScope - Gerar vídeo
 
 on:
   workflow_dispatch:
+    inputs:
+      narration:
+        description: "Roteiro em inglês que será narrado"
+        required: true
+        type: string
+        default: "Rockstar Games just revealed another detail that could change GTA Six. Here is what players need to know before the next trailer."
+      voice:
+        description: "Voz Kokoro"
+        required: true
+        type: choice
+        default: am_adam
+        options:
+          - am_adam
+          - am_michael
+          - af_heart
+          - af_bella
+      speed:
+        description: "Velocidade da narração"
+        required: true
+        type: choice
+        default: "1.08"
+        options:
+          - "0.95"
+          - "1.00"
+          - "1.08"
+          - "1.15"
 
 permissions:
   contents: read
@@ -12,9 +38,9 @@ concurrency:
 
 jobs:
   render:
-    name: Renderizar vídeo ViceScope
+    name: Gerar narração e vídeo
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
 
     steps:
       - name: Baixar arquivos do ViceScope
@@ -25,43 +51,84 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Instalar FFmpeg e fontes
+      - name: Instalar FFmpeg, Kokoro e dependências
+        shell: bash
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          sudo apt-get install -y ffmpeg fonts-dejavu-core espeak-ng
+          python -m pip install --upgrade pip
+          python -m pip install "kokoro>=0.9.4,<1" soundfile
           python --version
           ffmpeg -version | head -n 1
 
-      - name: Localizar renderizador
+      - name: Localizar projeto ViceScope
         id: localizar
         shell: bash
         run: |
           set -euo pipefail
           SCRIPT=$(find "$GITHUB_WORKSPACE" -type f -name "render.py" -not -path "*/.git/*" -print -quit)
+
           if [[ -z "$SCRIPT" ]]; then
             echo "::error::Arquivo render.py não encontrado."
             exit 1
           fi
+
           DIRETORIO=$(dirname "$SCRIPT")
-          echo "Renderizador: $SCRIPT"
+          echo "Diretório do projeto: $DIRETORIO"
           echo "render_dir=$DIRETORIO" >> "$GITHUB_OUTPUT"
-          test -f "$DIRETORIO/assets/narration.wav" || { echo "::error::Arquivo assets/narration.wav não encontrado."; exit 1; }
+
+          test -f "$DIRETORIO/generate_audio.py" || {
+            echo "::error::Arquivo generate_audio.py não encontrado."
+            exit 1
+          }
+
+      - name: Gerar narração com Kokoro
+        working-directory: ${{ steps.localizar.outputs.render_dir }}
+        shell: bash
+        env:
+          NARRATION_TEXT: ${{ inputs.narration }}
+          KOKORO_VOICE: ${{ inputs.voice }}
+          KOKORO_SPEED: ${{ inputs.speed }}
+          HF_HUB_DISABLE_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          python generate_audio.py
+
+          ffprobe \
+            -v error \
+            -show_entries format=duration \
+            -of default=noprint_wrappers=1 \
+            assets/narration.wav
 
       - name: Renderizar vídeo
         working-directory: ${{ steps.localizar.outputs.render_dir }}
         shell: bash
         run: |
           set -euo pipefail
+          rm -rf output
           mkdir -p output
           python render.py
+
           VIDEO=$(find output -maxdepth 1 -type f -name "*.mp4" -size +0c -print -quit)
+
           if [[ -z "$VIDEO" ]]; then
             echo "::error::Nenhum MP4 válido foi gerado."
             exit 1
           fi
-          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height -of default=noprint_wrappers=1 "$VIDEO"
-          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 "$VIDEO"
+
+          ffprobe \
+            -v error \
+            -select_streams v:0 \
+            -show_entries stream=codec_name,width,height \
+            -of default=noprint_wrappers=1 \
+            "$VIDEO"
+
+          ffprobe \
+            -v error \
+            -show_entries format=duration \
+            -of default=noprint_wrappers=1 \
+            "$VIDEO"
 
       - name: Salvar vídeo gerado
         uses: actions/upload-artifact@v4
@@ -72,9 +139,21 @@ jobs:
           retention-days: 7
           compression-level: 0
 
-      - name: Resumo da renderização
+      - name: Salvar narração de teste
+        uses: actions/upload-artifact@v4
+        with:
+          name: ViceScope-Audio-${{ github.run_number }}
+          path: ${{ steps.localizar.outputs.render_dir }}/assets/narration.wav
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
+      - name: Resumo
         if: success()
+        shell: bash
         run: |
-          echo "## ViceScope Render" >> "$GITHUB_STEP_SUMMARY"
-          echo "Renderização concluída com sucesso." >> "$GITHUB_STEP_SUMMARY"
-          echo "O vídeo está disponível em Artifacts." >> "$GITHUB_STEP_SUMMARY"
+          echo "## ViceScope" >> "$GITHUB_STEP_SUMMARY"
+          echo "Narração Kokoro e vídeo gerados com sucesso." >> "$GITHUB_STEP_SUMMARY"
+          echo "Voz: ${{ inputs.voice }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Velocidade: ${{ inputs.speed }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Baixe o vídeo e o áudio na seção Artifacts." >> "$GITHUB_STEP_SUMMARY"
