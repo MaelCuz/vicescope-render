@@ -9,6 +9,16 @@ on:
       - "vicescope-render/render.py"
       - "vicescope-render/generate_audio.py"
       - ".github/workflows/validate-vicescope-master.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "n8n/**"
+      - "infra/freellmapi/**"
+      - "docs/freellmapi-vicescope.md"
+      - "vicescope-render/render.py"
+      - "vicescope-render/generate_audio.py"
+      - ".github/workflows/validate-vicescope-master.yml"
   workflow_dispatch:
 
 permissions:
@@ -35,6 +45,9 @@ jobs:
 
       - name: Validate n8n workflows and contracts
         run: node n8n/tests/validate-master.mjs
+
+      - name: Validate FreeLLMAPI Compose
+        run: docker compose -f infra/freellmapi/compose.yaml config
 
       - name: Compile Python renderer
         run: python -m py_compile vicescope-render/render.py vicescope-render/generate_audio.py
