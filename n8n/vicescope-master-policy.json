@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "1.0",
+  "policyId": "vicescope-master-editorial",
+  "updatedAt": "2026-10-12",
+  "purpose": "Sistema editorial para vídeos curtos de notícias e análises sobre GTA VI com apelo forte, verificação factual e segurança de monetização.",
+  "nonNegotiables": [
+    "Não inventar fatos.",
+    "Não publicar automaticamente.",
+    "Não reutilizar frames vazados ou mídia obtida sem autorização.",
+    "Não apresentar arte gerada como screenshot oficial ou gameplay.",
+    "Não usar nudez, ato sexual, pose explícita ou texto sexualizado na capa.",
+    "A personagem escolhida precisa ter relação real com a pauta.",
+    "Vender a informação e a curiosidade, não o corpo."
+  ],
+  "research": {
+    "competitiveWindowDays": 15,
+    "sourceOrder": [
+      "Rockstar Games",
+      "fontes oficiais de plataforma",
+      "imprensa confiável",
+      "fontes desconhecidas com confirmação independente"
+    ],
+    "externalClaimsNeedTwoSignals": true,
+    "googleNewsDiscoveryUrlMustBeResolved": true
+  },
+  "characters": {
+    "lucia": [
+      "pauta sobre Lucia",
+      "história/personagem",
+      "atualização ampla oficial quando fizer sentido"
+    ],
+    "jason": [
+      "pauta sobre Jason",
+      "veículos",
+      "sistemas de gameplay",
+      "tecnologia"
+    ],
+    "duo": [
+      "trailer",
+      "história do casal",
+      "atualização oficial ampla",
+      "lançamento"
+    ],
+    "others": [
+      "usar somente quando o personagem for parte material da pauta"
+    ],
+    "antiClickbaitRule": "Não inserir personagem atraente em notícia sem relação factual."
+  },
+  "officialAssets": {
+    "galleryUrl": "https://www.rockstargames.com/VI/media/screenshots",
+    "officialLabelRequiresDirectRockstarOrigin": true,
+    "luciaRedBikiniBeach": {
+      "status": "pending_direct_official_identity_confirmation",
+      "action": "Revisão humana do arquivo direto antes de cadastrar como oficial.",
+      "fallback": "Criar conceito original não explícito com roupa vermelha de praia e marcar como conceito."
+    }
+  },
+  "generatedImages": {
+    "use": "capa original e cenas de apoio quando não houver mídia oficial adequada",
+    "disclosure": "CONCEPT VISUAL — NOT GAMEPLAY",
+    "required": [
+      "adult characters",
+      "original composition",
+      "negative space for headline",
+      "mobile readability",
+      "no logo by default",
+      "no text rendered inside source image"
+    ],
+    "forbidden": [
+      "nudity",
+      "sexual act",
+      "fetish framing",
+      "copied screenshot",
+      "leaked frame",
+      "fake official badge",
+      "fake gameplay claim"
+    ],
+    "safeFallback": "Trocar swimwear por roupa vermelha de praia totalmente vestida sem tentar contornar bloqueios."
+  },
+  "thumbnails": {
+    "size": "1280x720",
+    "maxFocalSubjects": 2,
+    "headlineWords": "2-4",
+    "variantsPerStory": 3,
+    "variants": [
+      "character-led",
+      "evidence/context-led",
+      "alternate-character-or-environment"
+    ],
+    "requiredLabelsForUnconfirmedClaims": [
+      "RUMOR",
+      "LEAK CLAIM"
+    ]
+  },
+  "adultTopics": {
+    "allowed": true,
+    "mode": "journalistic_non_explicit",
+    "manualApproval": true,
+    "titleMustBeRewrittenIfExplicit": true,
+    "explicitVisualsForbidden": true
+  },
+  "automation": {
+    "noAutomaticPublishing": true,
+    "humanApprovalBeforeRender": true,
+    "humanApprovalBeforePublish": true,
+    "zeroCostDefault": true,
+    "imageAutomationNote": "A API de geração de imagens do Gemini não possui Free Tier em 2026-10-12. Use arte oficial verificada ou gere manualmente no ChatGPT/Gemini até existir opção gratuita confiável."
+  }
+}
