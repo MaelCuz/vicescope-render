@@ -15,7 +15,8 @@ O workflow:
 - dá prioridade a fontes oficiais;
 - marca links do Google News para resolução no Fluxo 02;
 - marca rumores, datas anormais e fontes desconhecidas;
-- remove propaganda, pautas repetidas e temas de maior risco para anúncios;
+- remove propaganda e pautas repetidas;
+- mantém temas adultos relevantes ao GTA VI, mas exige abordagem jornalística não explícita;
 - mantém no máximo uma pauta por tema e uma pauta externa por veículo;
 - entrega no máximo seis candidatos em `ready_for_editorial_ai`;
 - inclui o contrato exato aceito pelo `render.yml`.
@@ -62,7 +63,8 @@ Antes de criar roteiro, o Fluxo 02 deverá:
 2. confirmar a afirmação na página de origem;
 3. procurar confirmação oficial ou uma segunda fonte independente;
 4. rejeitar pauta sem evidência suficiente;
-5. produzir roteiro estruturado dentro dos limites do renderizador.
+5. em temas adultos, reescrever título e miniatura sem termos ou imagens explícitas;
+6. produzir roteiro estruturado dentro dos limites do renderizador.
 
 ## Próximas etapas
 
