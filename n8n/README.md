@@ -87,3 +87,5 @@ A camada Master mantém a criatividade ligada à pauta e não a um personagem us
 - a imagem atribuída a Lucia com biquíni vermelho permanece pendente de confirmação direta do arquivo oficial;
 - geração automática de imagem do Gemini fica desligada por padrão porque os modelos de imagem não têm Free Tier em 12/10/2026;
 - publicação continua sempre manual.
+- o controle anti-aparência de IA rejeita anatomia errada, pele plástica, texto aleatório, neon excessivo e composição genérica;
+- acabamento profissional não autoriza chamar arte gerada de imagem oficial da Rockstar.
