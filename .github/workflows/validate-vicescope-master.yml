@@ -1,0 +1,40 @@
+name: Validate ViceScope Master
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "n8n/**"
+      - "vicescope-render/render.py"
+      - "vicescope-render/generate_audio.py"
+      - ".github/workflows/validate-vicescope-master.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-vicescope-master-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Audit Radar and Editorial Master
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate n8n workflows and contracts
+        run: node n8n/tests/validate-master.mjs
+
+      - name: Compile Python renderer
+        run: python -m py_compile vicescope-render/render.py vicescope-render/generate_audio.py
