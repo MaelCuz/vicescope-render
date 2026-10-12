@@ -130,10 +130,7 @@ filters.extend(
             f"drawtext=fontfile={FONT_REGULAR}:text='EDITORIAL NEWS':"
             "fontcolor=white@0.65:fontsize=30:x=w-text_w-70:y=1778"
         ),
-        (
-            f"drawbox=x=70:y=1840:w='(w-140)*t/{duration:.6f}':"
-            "h=10:color=0xFFCC00:t=fill"
-        ),
+        "drawbox=x=70:y=1840:w=940:h=10:color=0xFFCC00:t=fill",
         "format=yuv420p",
     ]
 )
