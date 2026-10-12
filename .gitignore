@@ -1,0 +1,7 @@
+# Credenciais locais
+infra/freellmapi/.env
+**/freellmapi*.db
+**/freellmapi*.db-*
+
+# Artefatos locais
+.DS_Store
