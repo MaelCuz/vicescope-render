@@ -45,3 +45,9 @@ Retorne um único objeto JSON com:
 - `manualApprovalRequired`: sempre `true`
 
 Se não houver confirmação suficiente, escolha `hold` ou `reject`. Nunca complete lacunas com invenção.
+
+## Controle de realismo
+
+Rejeite a imagem e gere nova direção se houver pele plástica, anatomia ou mãos erradas, texto aleatório, logotipo falso, reflexos incoerentes, geometria impossível de veículo, neon excessivo ou composição simétrica genérica. Exija textura natural, pequenas imperfeições, luz/perspectiva coerentes e leitura clara no tamanho de miniatura.
+
+A arte deve ter acabamento editorial profissional, mas nunca pode ser descrita como imagem oficial da Rockstar. No objeto de saída inclua `assetType: generated_concept`, `official: false`, `gameplay: false` e `humanApproved: false`.
