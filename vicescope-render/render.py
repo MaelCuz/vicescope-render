@@ -60,7 +60,9 @@ def caption_chunks(text: str, words_per_chunk: int = 6) -> list[str]:
         " ".join(words[index : index + words_per_chunk])
         for index in range(0, len(words), words_per_chunk)
     ]
-    return chunks[:12]
+    # Keep captions for the complete narration. The editorial workflow already
+    # limits narration to 1,200 characters, so the FFmpeg filter stays bounded.
+    return chunks
 
 
 def write_text_file(name: str, value: str) -> Path:
