@@ -10,30 +10,64 @@ O workflow:
 
 - executa manualmente ou a cada 30 minutos;
 - monitora o canal oficial da Rockstar Games;
-- monitora o Rockstar Newswire e tendências do GTA VI pelo Google News RSS;
-- aceita apenas itens relacionados ao GTA VI;
+- monitora Rockstar Newswire e tendências do GTA VI pelo Google News RSS;
+- separa o título limpo, o veículo e o link usado na descoberta;
 - dá prioridade a fontes oficiais;
-- marca fontes externas como `needs_verification`;
-- remove URLs repetidas durante 14 dias;
-- entrega um lote em `ready_for_ai` para a próxima etapa.
+- marca links do Google News para resolução no Fluxo 02;
+- marca rumores, datas anormais e fontes desconhecidas;
+- remove propaganda, pautas repetidas e temas de maior risco para anúncios;
+- mantém no máximo uma pauta por tema e uma pauta externa por veículo;
+- entrega no máximo seis candidatos em `ready_for_editorial_ai`;
+- inclui o contrato exato aceito pelo `render.yml`.
 
 Esta etapa não precisa de API, token ou credencial.
 
-## Como importar
+## Idiomas do pipeline
+
+- narração, título e subtítulo do vídeo: inglês (`en-US`);
+- resumo enviado ao Mael para aprovação: português (`pt-BR`).
+
+## Limites do renderizador
+
+- narração: até 1.200 caracteres;
+- título: até 50 caracteres;
+- subtítulo: até 70 caracteres;
+- vozes: `am_adam`, `am_michael`, `af_heart` ou `af_bella`;
+- velocidades: `0.95`, `1.00`, `1.08` ou `1.15`.
+
+## Como importar e testar
 
 1. Abra o n8n.
 2. Crie um workflow novo.
 3. No menu do workflow, escolha **Import from File**.
 4. Selecione `vicescope-01-radar-gta6.json`.
-5. Clique em **Test workflow**.
-6. Abra o último nó, **Radar pronto**, e confira o JSON de saída.
+5. Execute usando **Teste manual**.
+6. Abra o último nó, **Radar pronto**, e confira o JSON.
 
-Não ative a execução automática antes do teste manual.
+Não publique o workflow até o Fluxo 02 estar conectado.
+
+## Deduplicação
+
+O radar mantém URLs por 14 dias usando os dados estáticos do workflow.
+
+O n8n não persiste esses dados durante testes manuais. A memória passa a ser salva quando o workflow é publicado e executado pelo agendamento. Por isso, ver os mesmos itens em dois testes manuais não significa falha.
+
+## Segurança editorial
+
+O RSS serve apenas para descobrir possíveis pautas. Um título não é tratado como fato confirmado.
+
+Antes de criar roteiro, o Fluxo 02 deverá:
+
+1. resolver links intermediários do Google News;
+2. confirmar a afirmação na página de origem;
+3. procurar confirmação oficial ou uma segunda fonte independente;
+4. rejeitar pauta sem evidência suficiente;
+5. produzir roteiro estruturado dentro dos limites do renderizador.
 
 ## Próximas etapas
 
-1. Gemini cria três ângulos editoriais e o primeiro roteiro.
-2. Groq audita fatos, clichês e originalidade.
-3. Telegram envia os candidatos para aprovação do Mael.
-4. GitHub Actions recebe o roteiro aprovado e renderiza o vídeo.
-5. YouTube recebe primeiro como não listado para revisão final.
+1. Gemini cria ângulos editoriais e um roteiro em inglês.
+2. Groq audita fatos, clichês, risco e originalidade.
+3. Telegram envia resumo em português para aprovação do Mael.
+4. GitHub Actions recebe apenas o roteiro aprovado.
+5. O vídeo é gerado como artefato; publicação automática continuará desativada.
