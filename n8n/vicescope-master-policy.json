@@ -75,7 +75,33 @@
       "fake official badge",
       "fake gameplay claim"
     ],
-    "safeFallback": "Trocar swimwear por roupa vermelha de praia totalmente vestida sem tentar contornar bloqueios."
+    "safeFallback": "Trocar swimwear por roupa vermelha de praia totalmente vestida sem tentar contornar bloqueios.",
+    "realismQualityGate": {
+      "required": true,
+      "rejectIf": [
+        "plastic or over-smoothed skin",
+        "hand, anatomy, eye, or jewelry errors",
+        "random text or fake logos",
+        "inconsistent lighting, reflections, shadows, or perspective",
+        "impossible motorcycle or vehicle geometry",
+        "generic symmetrical AI-poster composition",
+        "excessive neon, bloom, sharpening, or HDR",
+        "near-copy of official or leaked composition"
+      ],
+      "require": [
+        "natural skin texture and small imperfections",
+        "coherent lens, lighting, shadows, and environment",
+        "clean silhouette at mobile thumbnail size",
+        "human review before use"
+      ]
+    },
+    "sourceTruth": "A qualidade pode parecer profissional; a origem nunca pode ser falsificada como Rockstar oficial.",
+    "internalMetadata": [
+      "assetType=generated_concept",
+      "official=false",
+      "gameplay=false",
+      "humanApproved=false_until_review"
+    ]
   },
   "thumbnails": {
     "size": "1280x720",
