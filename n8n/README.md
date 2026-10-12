@@ -73,3 +73,17 @@ Antes de criar roteiro, o Fluxo 02 deverá:
 3. Telegram envia resumo em português para aprovação do Mael.
 4. GitHub Actions recebe apenas o roteiro aprovado.
 5. O vídeo é gerado como artefato; publicação automática continuará desativada.
+
+## Versão Master 1.2
+
+A camada Master mantém a criatividade ligada à pauta e não a um personagem usado de forma aleatória.
+
+- `vicescope-master-policy.json`: regras permanentes de fonte, personagens, temas 18+, vazamentos, capas e aprovação.
+- `prompts/vicescope-editorial-master.md`: prompt do editor com saída JSON obrigatória.
+- `vicescope-02-editorial-master.json`: subworkflow importável e sem credenciais que converte o lote do Radar em três briefings de capa por pauta.
+- a galeria oficial da Rockstar é a primeira opção de mídia;
+- frames vazados nunca são reutilizados;
+- arte gerada é conceito, nunca é chamada de gameplay;
+- a imagem atribuída a Lucia com biquíni vermelho permanece pendente de confirmação direta do arquivo oficial;
+- geração automática de imagem do Gemini fica desligada por padrão porque os modelos de imagem não têm Free Tier em 12/10/2026;
+- publicação continua sempre manual.
