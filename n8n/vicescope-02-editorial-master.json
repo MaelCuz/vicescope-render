@@ -2,7 +2,16 @@
   "name": "ViceScope 02 - Editorial Master - Briefing 1.0",
   "nodes": [
     {
-      "parameters": {},
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "candidates",
+              "type": "array"
+            }
+          ]
+        }
+      },
       "id": "718289ae-904c-4f65-8cc7-3b0c360633f2",
       "name": "Receber lote do Radar",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
