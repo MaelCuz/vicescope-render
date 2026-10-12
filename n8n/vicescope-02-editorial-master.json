@@ -1,0 +1,115 @@
+{
+  "name": "ViceScope 02 - Editorial Master - Briefing 1.0",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "718289ae-904c-4f65-8cc7-3b0c360633f2",
+      "name": "Receber lote do Radar",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -500,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const incoming = $input.all();\nconst root = incoming[0]?.json || {};\nconst candidates = Array.isArray(root.candidates)\n  ? root.candidates\n  : incoming.map(item => item.json).filter(item => item?.candidateId);\n\nif (!candidates.length) {\n  throw new Error('Fluxo 02 recebeu zero candidatos. Execute o Radar e envie o lote completo.');\n}\n\nconst chooseLead = (candidate) => {\n  if (candidate.creativeLead) return candidate.creativeLead;\n  const text = `${candidate.title || ''} ${candidate.snippet || ''}`.toLowerCase();\n  if (text.includes('lucia') && text.includes('jason')) return 'lucia_and_jason';\n  if (text.includes('lucia')) return 'lucia';\n  if (text.includes('jason')) return 'jason';\n  return ['technology', 'platforms', 'gameplay'].includes(candidate.topic)\n    ? 'jason_or_story_subject'\n    : 'story_subject';\n};\n\nconst disclosure = 'CONCEPT VISUAL — NOT GAMEPLAY';\n\nreturn candidates.map(candidate => {\n  const lead = chooseLead(candidate);\n  const claimLabel = candidate.thumbnailTextMode === 'claim_label'\n    ? (candidate.topic === 'leak' ? 'LEAK CLAIM' : 'RUMOR')\n    : (candidate.official ? 'OFFICIAL' : '');\n\n  const commonImageRules = [\n    'original 16:9 YouTube thumbnail background',\n    'adult characters only',\n    'one clear focal subject, maximum two',\n    'high contrast and mobile readability',\n    'leave negative space for 2-4 word headline',\n    'no text rendered into source image',\n    'no nudity or sexual act',\n    'no copied screenshot or leaked frame',\n    'no logo or fake gameplay UI'\n  ].join('; ');\n\n  return {\n    json: {\n      candidateId: candidate.candidateId,\n      editorialStatus: 'needs_verification_and_human_approval',\n      candidate,\n      creativeBrief: {\n        lead,\n        claimLabel,\n        messageStrategy: 'sell_information_not_body',\n        assetOrder: [\n          'direct_verified_rockstar_asset',\n          'verified_press_asset_with_rights',\n          'original_generated_concept'\n        ],\n        officialGallery: 'https://www.rockstargames.com/VI/media/screenshots',\n        thumbnailVariants: [\n          {\n            type: 'character-led',\n            lead,\n            imagePrompt: `${commonImageRules}; lead: ${lead}; visually express the verified subject without inventing events`\n          },\n          {\n            type: 'evidence-led',\n            lead: 'story_subject',\n            imagePrompt: `${commonImageRules}; emphasize the verified location, object, document, vehicle, or announcement`\n          },\n          {\n            type: 'alternate',\n            lead: lead === 'lucia' ? 'jason_or_environment' : 'lucia_or_environment',\n            imagePrompt: `${commonImageRules}; alternate angle tied directly to the same verified story`\n          }\n        ],\n        generatedVisualDisclosure: disclosure,\n        redBeachOutfitFallback:\n          'If the verified official Lucia red-bikini asset is unavailable or unconfirmed, use an original non-explicit red beach outfit concept and include the disclosure.'\n      },\n      editorialPromptFile: 'n8n/prompts/vicescope-editorial-master.md',\n      policyFile: 'n8n/vicescope-master-policy.json'\n    }\n  };\n});"
+      },
+      "id": "442ec84a-6844-486e-93cf-aa3e3dc4425e",
+      "name": "Aplicar raciocinio Master",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const packages = $input.all().map(item => item.json);\nreturn [{\n  json: {\n    schemaVersion: '2.0',\n    status: 'ready_for_editorial_model',\n    generatedAt: new Date().toISOString(),\n    count: packages.length,\n    manualApprovalRequired: true,\n    noAutomaticPublishing: true,\n    packages\n  }\n}];"
+      },
+      "id": "9adb9c60-8bd2-4b18-86c4-70272e70b5c4",
+      "name": "Montar pacote editorial",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        40,
+        160
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "40ca1c79-8cdf-42df-bebf-b0d276fe31aa",
+      "name": "Pronto para modelo editorial",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        320,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ViceScope 02 — Editorial Master\n\nRecebe o lote do Radar 1.2 e cria três direções de capa por pauta.\n\n- escolhe Lucia, Jason, dupla ou outro personagem conforme o assunto;\n- proíbe frame vazado e falso gameplay;\n- aceita tema adulto só em modo jornalístico não explícito;\n- usa arte oficial verificada ou conceito original identificado;\n- exige aprovação humana.\n\nPróxima conexão: modelo textual gratuito do Gemini para título, roteiro e revisão. Geração automática de imagem fica desligada enquanto não houver opção confiável sem custo.",
+        "height": 360,
+        "width": 430,
+        "color": 5
+      },
+      "id": "aa397dee-22cf-4f18-9670-d5bf475b305d",
+      "name": "Como funciona",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -500,
+        -270
+      ]
+    }
+  ],
+  "connections": {
+    "Receber lote do Radar": {
+      "main": [
+        [
+          {
+            "node": "Aplicar raciocinio Master",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aplicar raciocinio Master": {
+      "main": [
+        [
+          {
+            "node": "Montar pacote editorial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar pacote editorial": {
+      "main": [
+        [
+          {
+            "node": "Pronto para modelo editorial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Sao_Paulo",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}
