@@ -7,6 +7,7 @@ import json
 import os
 import re
 import subprocess
+import textwrap
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -48,7 +49,10 @@ def probe_duration(path: Path) -> float:
 
 def clean_text(value: str, fallback: str, limit: int) -> str:
     value = re.sub(r"\s+", " ", value).strip()
-    return (value or fallback)[:limit]
+    value = value or fallback
+    if not value or len(value) > limit:
+        raise ValueError(f"Text must contain 1–{limit} characters.")
+    return value
 
 
 def caption_chunks(text: str, words_per_chunk: int = 6) -> list[str]:
@@ -78,7 +82,7 @@ def ffmpeg_path(path: Path) -> str:
 duration = probe_duration(AUDIO)
 narration = clean_text(
     os.environ.get("NARRATION_TEXT", ""),
-    "Rockstar Games just revealed another detail that could change GTA Six.",
+    "",
     1200,
 )
 title = clean_text(os.environ.get("VIDEO_TITLE", ""), "GTA VI NEWS", 50).upper()
@@ -89,18 +93,18 @@ subtitle = clean_text(
 ).upper()
 captions = caption_chunks(narration)
 
-title_file = write_text_file("title.txt", title)
-subtitle_file = write_text_file("subtitle.txt", subtitle)
+title_file = write_text_file("title.txt", "\n".join(textwrap.wrap(title, width=24)))
+subtitle_file = write_text_file("subtitle.txt", "\n".join(textwrap.wrap(subtitle, width=34)))
 
 filters = [
     "drawbox=x=70:y=210:w=940:h=8:color=0xFFCC00:t=fill",
     (
         f"drawtext=fontfile={FONT_BOLD}:textfile='{ffmpeg_path(title_file)}':"
-        "fontcolor=white:fontsize=92:x=(w-text_w)/2:y=290"
+        "expansion=none:fontcolor=white:fontsize=58:line_spacing=12:x=(w-text_w)/2:y=255"
     ),
     (
         f"drawtext=fontfile={FONT_BOLD}:textfile='{ffmpeg_path(subtitle_file)}':"
-        "fontcolor=0xFFCC00:fontsize=46:x=(w-text_w)/2:y=430"
+        "expansion=none:fontcolor=0xFFCC00:fontsize=38:line_spacing=10:x=(w-text_w)/2:y=430"
     ),
     "drawbox=x=70:y=560:w=940:h=530:color=0x16213E@0.92:t=fill",
     "drawbox=x=90:y=580:w=900:h=490:color=0x0F3460@0.55:t=fill",
@@ -114,10 +118,10 @@ segment = duration / len(captions)
 for index, caption in enumerate(captions):
     start = index * segment
     end = duration if index == len(captions) - 1 else (index + 1) * segment
-    caption_file = write_text_file(f"caption_{index:02d}.txt", caption.upper())
+    caption_file = write_text_file(f"caption_{index:02d}.txt", "\n".join(textwrap.wrap(caption.upper(), width=28)))
     filters.append(
         f"drawtext=fontfile={FONT_BOLD}:textfile='{ffmpeg_path(caption_file)}':"
-        "fontcolor=white:fontsize=58:x=(w-text_w)/2:y=1280:"
+        "expansion=none:fontcolor=white:fontsize=48:line_spacing=12:x=(w-text_w)/2:y=1280:"
         "box=1:boxcolor=black@0.72:boxborderw=28:"
         f"enable='between(t,{start:.3f},{end:.3f})'"
     )
