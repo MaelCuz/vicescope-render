@@ -150,6 +150,27 @@ jobs:
             -of default=noprint_wrappers=1 \
             "$VIDEO"
 
+      - name: Validar e preparar mídias para OpenCut
+        working-directory: ${{ steps.localizar.outputs.render_dir }}
+        shell: bash
+        env:
+          NARRATION_TEXT: ${{ inputs.narration || 'Welcome to ViceScope. This is a production preview of our GTA Six news format. We start with a clear headline, explain the story using reliable sources, and separate confirmed information from rumors. The narration, title, and captions are generated from the same script. This demonstration lets us check the voice, pacing, readability, and vertical layout before publishing. Every real story will still need factual review and human approval. Watch the captions, listen to the voice, and tell us what should change. This is a format test, not a Rockstar announcement.' }}
+          VIDEO_TITLE: ${{ inputs.title || 'VICESCOPE PREVIEW' }}
+          VIDEO_SUBTITLE: ${{ inputs.subtitle || 'FORMAT TEST - NOT A NEWS REPORT' }}
+        run: |
+          set -euo pipefail
+          python -m unittest -v test_export_opencut.py
+          python export_opencut.py
+
+      - name: Salvar pacote de mídias para OpenCut
+        uses: actions/upload-artifact@v4
+        with:
+          name: ViceScope-OpenCut-Media-${{ github.run_number }}
+          path: ${{ steps.localizar.outputs.render_dir }}/output/ViceScope-OpenCut-Media.zip
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
       - name: Salvar vídeo gerado
         uses: actions/upload-artifact@v4
         with:
@@ -177,4 +198,4 @@ jobs:
           echo "Voz: ${{ inputs.voice || 'am_adam' }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Velocidade: ${{ inputs.speed || '1.08' }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Título: ${{ inputs.title || 'VICESCOPE PREVIEW' }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Baixe o vídeo e o áudio na seção Artifacts." >> "$GITHUB_STEP_SUMMARY"
+          echo "Baixe vídeo, áudio e pacote de mídias separadas para OpenCut na seção Artifacts." >> "$GITHUB_STEP_SUMMARY"
