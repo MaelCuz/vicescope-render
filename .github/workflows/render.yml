@@ -13,17 +13,17 @@ on:
         description: "Roteiro em inglês que será narrado"
         required: true
         type: string
-        default: "Rockstar Games just revealed another detail that could change GTA Six. Here is what players need to know before the next trailer."
+        default: "Welcome to ViceScope. This is a production preview of our GTA Six news format. We start with a clear headline, explain the story using reliable sources, and separate confirmed information from rumors. The narration, title, and captions are generated from the same script. This demonstration lets us check the voice, pacing, readability, and vertical layout before publishing. Every real story will still need factual review and human approval. Watch the captions, listen to the voice, and tell us what should change. This is a format test, not a Rockstar announcement."
       title:
         description: "Título principal do vídeo"
         required: true
         type: string
-        default: "GTA VI NEWS"
+        default: "VICESCOPE PREVIEW"
       subtitle:
         description: "Subtítulo do vídeo"
         required: true
         type: string
-        default: "THE DETAIL EVERYONE MISSED"
+        default: "FORMAT TEST - NOT A NEWS REPORT"
       voice:
         description: "Voz Kokoro"
         required: true
@@ -103,7 +103,7 @@ jobs:
         working-directory: ${{ steps.localizar.outputs.render_dir }}
         shell: bash
         env:
-          NARRATION_TEXT: ${{ inputs.narration || 'Rockstar Games just revealed another detail that could change GTA Six. Here is what players need to know before the next trailer.' }}
+          NARRATION_TEXT: ${{ inputs.narration || 'Welcome to ViceScope. This is a production preview of our GTA Six news format. We start with a clear headline, explain the story using reliable sources, and separate confirmed information from rumors. The narration, title, and captions are generated from the same script. This demonstration lets us check the voice, pacing, readability, and vertical layout before publishing. Every real story will still need factual review and human approval. Watch the captions, listen to the voice, and tell us what should change. This is a format test, not a Rockstar announcement.' }}
           KOKORO_VOICE: ${{ inputs.voice || 'am_adam' }}
           KOKORO_SPEED: ${{ inputs.speed || '1.08' }}
           HF_HUB_DISABLE_TELEMETRY: "1"
@@ -121,9 +121,9 @@ jobs:
         working-directory: ${{ steps.localizar.outputs.render_dir }}
         shell: bash
         env:
-          NARRATION_TEXT: ${{ inputs.narration || 'Rockstar Games just revealed another detail that could change GTA Six. Here is what players need to know before the next trailer.' }}
-          VIDEO_TITLE: ${{ inputs.title || 'GTA VI NEWS' }}
-          VIDEO_SUBTITLE: ${{ inputs.subtitle || 'THE DETAIL EVERYONE MISSED' }}
+          NARRATION_TEXT: ${{ inputs.narration || 'Welcome to ViceScope. This is a production preview of our GTA Six news format. We start with a clear headline, explain the story using reliable sources, and separate confirmed information from rumors. The narration, title, and captions are generated from the same script. This demonstration lets us check the voice, pacing, readability, and vertical layout before publishing. Every real story will still need factual review and human approval. Watch the captions, listen to the voice, and tell us what should change. This is a format test, not a Rockstar announcement.' }}
+          VIDEO_TITLE: ${{ inputs.title || 'VICESCOPE PREVIEW' }}
+          VIDEO_SUBTITLE: ${{ inputs.subtitle || 'FORMAT TEST - NOT A NEWS REPORT' }}
         run: |
           set -euo pipefail
           rm -rf output
@@ -176,5 +176,5 @@ jobs:
           echo "Narração Kokoro e vídeo gerados com sucesso." >> "$GITHUB_STEP_SUMMARY"
           echo "Voz: ${{ inputs.voice || 'am_adam' }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Velocidade: ${{ inputs.speed || '1.08' }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Título: ${{ inputs.title || 'GTA VI NEWS' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Título: ${{ inputs.title || 'VICESCOPE PREVIEW' }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Baixe o vídeo e o áudio na seção Artifacts." >> "$GITHUB_STEP_SUMMARY"
